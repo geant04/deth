@@ -1265,11 +1265,12 @@ GameObject:
   m_Component:
   - component: {fileID: 920441897}
   - component: {fileID: 920441896}
-  - component: {fileID: 920441895}
   - component: {fileID: 920441901}
+  - component: {fileID: 920441902}
   - component: {fileID: 920441899}
   - component: {fileID: 920441900}
-  - component: {fileID: 920441902}
+  - component: {fileID: 920441895}
+  - component: {fileID: 920441903}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -1289,21 +1290,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b83cce39eaf096448b5123d47d72e0f3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  bullet: {fileID: 4339274386121854190, guid: 1139cd71a29844240ac57e007c0654fa, type: 3}
-  pellet: {fileID: 4339274386121854190, guid: cb83eaa72eea9574289b62a4556a69e8, type: 3}
+  direction: {x: 0, y: 0, z: 0}
   rb: {fileID: 920441899}
-  healthText: {fileID: 1263644138}
   anim: {fileID: 920441901}
-  currGunText: {fileID: 2074850997}
-  currGunImage: {fileID: 1923262348}
-  pistolSprite: {fileID: 1510449707, guid: 12eddd37bec80ab4ca2f4074f06cb812, type: 3}
-  autoSprite: {fileID: -441228741, guid: 12eddd37bec80ab4ca2f4074f06cb812, type: 3}
-  shotgunSprite: {fileID: 1363188343, guid: 12eddd37bec80ab4ca2f4074f06cb812, type: 3}
+  healthText: {fileID: 1263644138}
   gameOver: {fileID: 1555830959}
   audioSource: {fileID: 920441902}
-  pistolSound: {fileID: 8300000, guid: 13fcf14f1f77a7f45b43d837c598d17f, type: 3}
-  rifleSound: {fileID: 8300000, guid: 43f515794a5018f448f9eb4b72422a12, type: 3}
-  shotgunSound: {fileID: 8300000, guid: 98d3a7cc2b97383418e48acfd9c0ac6d, type: 3}
   hitSound: {fileID: 8300000, guid: ae95bbdacdcb0314ca16444e3068beee, type: 3}
   overlay: {fileID: 132388980}
 --- !u!212 &920441896
@@ -1644,6 +1636,23 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!114 &920441903
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 920441894}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0fdbde1d3b09477e977e0c3605764737, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  currGunText: {fileID: 2074850997}
+  currGunImage: {fileID: 1923262348}
+  pistolPrefab: {fileID: 940721746002200116, guid: fad189a317906a54188de3c532047ecb, type: 3}
+  assaultRiflePrefab: {fileID: 39108259345063882, guid: 539257c30ff5c3945baf6a2bd0578797, type: 3}
+  shotgunPrefab: {fileID: 7274816993194998247, guid: 7ae2f3a11d0c4cf48975fde58285f2a9, type: 3}
 --- !u!1 &924452299
 GameObject:
   m_ObjectHideFlags: 0

@@ -1,4 +1,3 @@
-using System;
 using System.Collections;
 using InventorySystem;
 using UnityEngine;
@@ -7,39 +6,31 @@ using UnityEngine.UI;
 
 public class Player : MonoBehaviour
 {
-    private Inventory _inventory;
+    private float _health = 100.0f;
+    private const float Speed = 5.0f;
     
-    private float health = 100.0f;
-    private float speed = 6.0f;
+    public Vector3 direction = new(0, 0, 0);
+
+    private Inventory _inventory;
+    private SpriteRenderer _spriteRenderer;
     
     public Rigidbody2D rb;
     public Animator anim;
     
     public TMP_Text healthText;
-    public GameObject currGunText;
-    public GameObject currGunImage;
     public GameObject gameOver;
-
-    private float hitDamage;
-    private Color ogColor;
+    public Image overlay;
     
-    private Coroutine dmgCoroutine;
+    private Coroutine _dmgCoroutine;
     
-    private const float Speed = 5.0f;
-    public Vector3 direction = new(0, 0, 0);
-
-    private float _pistolCooldown;
-    private float _automaticCooldown;
-    private float _shotgunCooldown;
-
     public AudioSource audioSource;
     public AudioClip hitSound;
-
-    public Image overlay;
+    
     private static readonly int MouseHeldDown = Animator.StringToHash("MouseHeldDown");
+    private static readonly int MouseClicked = Animator.StringToHash("MouseClicked");
 
     private void RotatePlayer() {
-        var charVector = Camera.main.WorldToScreenPoint(transform.position);
+        var charVector = Camera.main!.WorldToScreenPoint(transform.position);
         direction = Input.mousePosition - charVector;
         
         var angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
@@ -47,117 +38,89 @@ public class Player : MonoBehaviour
     }
     
     public void TakeDamage(float f) {
-        health -= f;
-        hitDamage = 0.25f;
-        healthText.text = "HP " + health;
-        
+        _health -= f;
+        healthText.text = "HP " + _health;
         audioSource.PlayOneShot(hitSound, 1f);
 
-        if (dmgCoroutine != null)
-        {
-            StopCoroutine(dmgCoroutine);
-        }
+        if (_dmgCoroutine != null) StopCoroutine(_dmgCoroutine);
         StartCoroutine(AnimTakeDamage());
     }
 
     private IEnumerator AnimTakeDamage()
     {
         var elapsed = 0f;
+        const float duration = 0.4f;
 
-        while (elapsed < 0.5f)
+        while (elapsed < duration)
         {
             elapsed += Time.deltaTime;
-            var ratio = elapsed / 0.5f;
+            var ratio = elapsed / duration;
 
             var opacity = Mathf.Lerp(0.5f, 0f, ratio);
             overlay.color = new Color(overlay.color.r, overlay.color.g, overlay.color.b, opacity);
+            
+            var color = Color.Lerp(Color.red, Color.white, ratio);
+            _spriteRenderer.color = color;
 
             yield return null;
         }
+
+        // just in case it doesn't fully return back to normal
+        _spriteRenderer.color = Color.white;
+        overlay.color = new Color(overlay.color.r, overlay.color.g, overlay.color.b, 0f);
     }
-
-    public IEnumerator AnimateCurrGun(string gunName, Sprite sprite)
-    {
-        currGunText.GetComponent<TMP_Text>().text = gunName;
-        currGunImage.GetComponent<Image>().sprite = sprite;
-
-        var xText = currGunText.GetComponent<RectTransform>().anchoredPosition.x;
-        var xImage = currGunImage.GetComponent<RectTransform>().anchoredPosition.x;
-        
-        var initText = new Vector2(xText, -200);
-        var initImage = new Vector2(xImage, -250);
-        
-        var finText = new Vector2(xText, 116);
-        var finImage = new Vector2(xImage, 217);
-
-        var elapsed = 0f;
-
-        while (elapsed < 0.5f)
-        {
-            elapsed += Time.deltaTime;
-            
-            var ratio = EaseOutExpo(elapsed / 0.5f);
-            currGunText.GetComponent<RectTransform>().anchoredPosition = Vector2.Lerp(initText, finText, ratio);
-            currGunImage.GetComponent<RectTransform>().anchoredPosition = Vector2.Lerp(initImage, finImage, ratio);
-            
-            yield return null;
-        }
-    }
-
-    private static float EaseOutExpo(float num)
-    {
-        return num >= 1 ? 1 : (float) (1 - Math.Pow(2, -10 * num));
-    }
-
+    
     private void Start()
     {
-        _inventory = new Inventory(this);
+        _inventory = gameObject.GetComponent<Inventory>();
+        _spriteRenderer = GetComponent<SpriteRenderer>();
         
-        healthText.text = "HP " + health;
-        currGunText.GetComponent<TMP_Text>().text = _inventory.Curr.weaponName;
-        currGunImage.GetComponent<Image>().sprite = _inventory.Curr.sprite;
-
-        ogColor = GetComponent<SpriteRenderer>().color;
-        
-        StartCoroutine(AnimateCurrGun(_inventory.Curr.weaponName, _inventory.Curr.sprite));
+        healthText.text = "HP " + _health;
     }
 
     private void Update()
     {
-        if (health <= 0.0f)
+        if (_health <= 0.0f)
         {
             gameOver.SetActive(true);
-            
             Destroy(gameObject);
+            
             return;
-        }
-        
-        if (hitDamage != 0f)
-        {
-            hitDamage = Mathf.Max(0.0f, hitDamage - Time.deltaTime);
-
-            var dmg = Color.Lerp(ogColor, Color.red, hitDamage / 0.25f);
-            GetComponent<SpriteRenderer>().color = dmg;
         }
         
         float h = 0;
         float v = 0;
 
-        if(Input.GetKey(KeyCode.W)) {
+        if (Input.GetKey(KeyCode.W))
+        {
             v = 1;
-        } else if(Input.GetKey(KeyCode.S)) {
+        }
+        
+        if (Input.GetKey(KeyCode.S))
+        {
             v = -1;
-        } else if(Input.GetKey(KeyCode.A)) {
+        }
+
+        if (Input.GetKey(KeyCode.A))
+        {
             h = -1;
-        } else if(Input.GetKey(KeyCode.D)) {
+        }
+
+        if (Input.GetKey(KeyCode.D))
+        {
             h = 1;
         }
 
         RotatePlayer();
 
-        if (Input.GetMouseButtonDown(0) || Input.GetMouseButton(0))
+        if (Input.GetMouseButtonDown(0))
         {
-            _inventory.ShootWeapon();
+            _inventory.ShootCurrWeapon();
+            anim.SetTrigger(MouseClicked);
+        } else if (Input.GetMouseButton(0) && _inventory.Curr().WeaponId == WeaponId.AssaultRifle)
+        {
+            _inventory.ShootCurrWeapon();
+            anim.SetBool(MouseHeldDown, true);
         } else if (Input.GetMouseButtonUp(0))
         {
             anim.SetBool(MouseHeldDown, false);
@@ -174,15 +137,5 @@ public class Player : MonoBehaviour
         }
 
         rb.velocity = change * Speed;
-
-        if(_pistolCooldown > 0.0f) {
-            _pistolCooldown = Mathf.Max(_pistolCooldown - Time.deltaTime, 0.0f);
-        }
-        if(_automaticCooldown > 0.0f) {
-            _automaticCooldown = Mathf.Max(_automaticCooldown - Time.deltaTime, 0.0f);
-        }
-        if(_shotgunCooldown > 0.0f) {
-            _shotgunCooldown = Mathf.Max(_shotgunCooldown - Time.deltaTime, 0.0f);
-        }
     }
 }

@@ -7,24 +7,20 @@ namespace InventorySystem
         [SerializeField] private GameObject pellet;
 
         private const int NumPellets = 4;
-        private static readonly int MouseClicked = Animator.StringToHash("MouseClicked");
 
-        public override void Shoot()
+        public override void Shoot(Transform entTransform, Vector3 entDirection, AudioSource audioSrc)
         {
             if (!CanShoot) return;
 
             StartCoroutine(SetCooldown());
-            Player.anim.SetTrigger(MouseClicked);
-            
-            var pTransform = Player.transform;
             
             for (var i = -NumPellets + 1; i < NumPellets; i++) {
                 var angle = i / (float) NumPellets * 10f;
                 
-                Vector2 rotatedVector = Quaternion.Euler(0, 0, angle) * Player.direction;
+                Vector2 rotatedVector = Quaternion.Euler(0, 0, angle) * entDirection;
                 rotatedVector.Normalize();
 
-                var projGameObj = Instantiate(pellet, pTransform.position + (0.5f * Player.direction.normalized), pTransform.rotation);
+                var projGameObj = Instantiate(pellet, entTransform.position + (0.5f * entDirection.normalized), entTransform.rotation);
                 projGameObj.transform.localScale = new Vector3(0.175f, 0.175f, 0.0f);
 
                 var pelletScript = projGameObj.GetComponent<BulletScript>();
@@ -33,18 +29,19 @@ namespace InventorySystem
                 pelletScript.speed = Damage + Random.Range(1, 5);
             }
             
-            Player.audioSource.PlayOneShot(shootSfx, 0.4f);
+            audioSrc.PlayOneShot(shootSfx, 0.3f);
         }
-        
-        public Shotgun(Player player)
-        {
-            weaponName = "Shotgun";
-            FireRate = 0.65f;
 
+        private void Start()
+        {
+            WeaponName = "Shotgun";
+            WeaponId = WeaponId.Shotgun;
+            
+            CanShoot = true;
+            FireRate = 0.65f;
+            
             ProjSpeed = 16f;
             Damage = 15f;
-            
-            Player = player;
         }
     }
 }
