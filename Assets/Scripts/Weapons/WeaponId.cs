@@ -1,4 +1,4 @@
-﻿namespace InventorySystem
+﻿namespace Weapons
 {
     public enum WeaponId
     {
