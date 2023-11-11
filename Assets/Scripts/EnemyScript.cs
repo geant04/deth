@@ -180,7 +180,7 @@ public class EnemyScript : MonoBehaviour
 
                     if(_explodeTimer < 0.0f) {
                         _health = 0.0f;
-                        _player.GetComponent<PlayerScript>().takeDamage(20.0f);
+                        _player.GetComponent<PlayerScript>().TakeDamage(20.0f);
                         return;
                     }
                     if(_explodeTimer == 0.0f) {
