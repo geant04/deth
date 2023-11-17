@@ -6,8 +6,16 @@ using TMPro;
 
 public class GameManager : MonoBehaviour
 {
-    public GameObject normalEnemy;
-    public GameObject railGunEnemy;
+    private bool TESTING = false;
+
+    // CONSTANTS
+    private const int NORMAL = 0;
+    private const int RAILGUN = 1;
+    private const int GUNNER = 2;
+    private const int DUMMY = 3;
+
+    public GameObject[] enemies;
+    
     public GameObject player;
     public Tilemap tilemap;
     public TileBase ruleTile;
@@ -349,19 +357,22 @@ public class GameManager : MonoBehaviour
         pos = new Vector3Int(width + offset.x - 1, height + offset.y - 1, 0);
         bgTilemap.SetTile(pos, borderTile);
     }
+    
 
     private void GenerateTilemapShadowCasters() { 
         for(int i = 0; i < shadowCasters.Count; i++) {
             Destroy(shadowCasters[i]);
         }
 
+
         GameObject shadowCastersContainer = GameObject.Find("ShadowCasters");
 
         for(int i = 0; i < CurrentMap.Length; i++) {
             for(int j = 0; j < CurrentMap[0].Length; j++) {
                 if(CurrentMap[i][j] == 1) {
-                    GameObject ShadowCasterOBJ = Instantiate(ShadowCasterPrefab, new Vector3(j - (CurrentMap[0].Length / 2.0f), 
-                                                             i - (CurrentMap.Length / 2.0f), 0.0f), Quaternion.identity, shadowCastersContainer.transform);
+                    GameObject ShadowCasterOBJ = Instantiate(ShadowCasterPrefab, new Vector3(j - (CurrentMap[0].Length / 2), 
+                                                             i - (CurrentMap.Length / 2), 0.0f), Quaternion.identity, shadowCastersContainer.transform);
+                    //UnityEngine.Debug.Log(ShadowCasterOBJ.transform.position);
                     shadowCasters.Add(ShadowCasterOBJ);
                 }
             }
@@ -373,15 +384,31 @@ public class GameManager : MonoBehaviour
         roundText.text = "Round " + _roundNum;
         bigRoundText.text = _roundNum.ToString();
         
-        CurrentMap = GenerateFullMap(5, 3);
+        if(TESTING) {
+            int[][] test = 
+            {
+                new int[] {1,1,1,1,1,1,1,1,1,1},
+                new int[] {1,0,0,0,0,0,0,0,0,1},
+                new int[] {1,0,1,1,1,0,0,0,0,1},
+                new int[] {1,0,0,0,0,0,0,0,0,1},
+                new int[] {1,1,1,1,1,1,1,1,0,1},
+                new int[] {1,0,0,0,0,0,0,1,0,1},
+                new int[] {1,0,0,0,0,1,0,1,0,1},
+                new int[] {1,0,0,0,0,1,0,0,0,1},
+                new int[] {1,1,1,1,1,1,1,1,1,1}
+            };
+            CurrentMap = test;
+
+        } else {
+            CurrentMap = GenerateFullMap(5, 3);
+        }
+        
         tilemap.ClearAllTiles();
         bgTilemap.ClearAllTiles();
         MapToTile();
         GenerateTilemapShadowCasters();
 
-        bool debug = true;
-
-        for (var i = 0; i < Mathf.Min(20, _roundNum + 2); i++)
+        for (var i = 0; i < Mathf.Min(20, _roundNum + 2) && !TESTING; i++)
         {
             int y = Random.Range(1, CurrentMap.Length - 1);
             int x = Random.Range(1, CurrentMap[0].Length - 1);
@@ -396,9 +423,28 @@ public class GameManager : MonoBehaviour
             float ex = (float) x - (CurrentMap[0].Length / 2.0f);
 
             var enemy = null as GameObject;
+
+            int spawn = Random.Range(0, 3);
+
+            switch(spawn) {
+                case 0:
+                    enemy = Instantiate(enemies[NORMAL], new Vector3(ex, ey, 0.0f), Quaternion.identity);
+                    break;
+                case 1:
+                    enemy = Instantiate(enemies[RAILGUN], new Vector3(ex, ey, 0.0f), Quaternion.identity);
+                    break;
+                case 2:
+                    enemy = Instantiate(enemies[GUNNER], new Vector3(ex, ey, 0.0f), Quaternion.identity);
+                    break;
+            }
+
+            //enemy = Instantiate(Random.Range(0,1) == 1 ? enemies[RAILGUN] : enemies[NORMAL], new Vector3(ex, ey, 0.0f), Quaternion.identity);
             
-            enemy = Instantiate(debug && Random.Range(0,2) == 1 ? railGunEnemy : normalEnemy, new Vector3(ex, ey, 0.0f), Quaternion.identity);
-            
+            EnemyList.Add(enemy);
+        }
+
+        if(TESTING) {
+            GameObject enemy = Instantiate(enemies[GUNNER], new Vector3(1.0f - (CurrentMap.Length / 2.0f), 8.0f - (CurrentMap[0].Length / 2.0f), 0.0f), Quaternion.identity);
             EnemyList.Add(enemy);
         }
         

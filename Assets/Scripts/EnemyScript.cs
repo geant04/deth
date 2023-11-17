@@ -84,7 +84,7 @@ public class EnemyScript : MonoBehaviour
         return (y >= 0 && y < maze.Length) && (x >= 0 && x < maze[0].Length) && (maze[y][x] == 0) && !visited.Contains((y, x));
     }
     
-    List<(int, int)> MazeSolver(int[][] maze, (int, int) start, (int, int) end) {
+    public List<(int, int)> MazeSolver(int[][] maze, (int, int) start, (int, int) end) {
         // Directions for moving up, down, left, and right
         
         float n = GameManager.CurrentMap[0].Length;
