@@ -406,18 +406,25 @@ public class GameManager : MonoBehaviour
         tilemap.ClearAllTiles();
         bgTilemap.ClearAllTiles();
         MapToTile();
-        GenerateTilemapShadowCasters();
+        //GenerateTilemapShadowCasters(); too unoptimized
 
-        for (var i = 0; i < Mathf.Min(20, _roundNum + 2) && !TESTING; i++)
+        int minEnemies = 10;
+
+        for (var i = 0; i < Mathf.Min(minEnemies, _roundNum + minEnemies) && !TESTING; i++)
         {
             int y = Random.Range(1, CurrentMap.Length - 1);
             int x = Random.Range(1, CurrentMap[0].Length - 1);
 
-            while(CurrentMap[y][x] == 1 || (Mathf.Abs(Py - (float)(y)) < 7.0f && Mathf.Abs(Px - (float)(x)) < 7.0f))
+            while(CurrentMap[y][x] > 0 || (Mathf.Abs(Py - (float)(y)) < 7.0f && Mathf.Abs(Px - (float)(x)) < 7.0f))
             {
                 y = Random.Range(1, CurrentMap.Length - 1);
                 x = Random.Range(1, CurrentMap[0].Length - 1);
             }
+
+            // This prevents two enemies from spawning in the same spot
+            // Additionally, you're not going to use CurrentMap again later on, so this is fine
+            // I don't know if setting it to 1 messes up enemy pathfinding
+            CurrentMap[y][x] = 2;
 
             float ey = (float) y - (CurrentMap.Length / 2.0f);
             float ex = (float) x - (CurrentMap[0].Length / 2.0f);
@@ -443,7 +450,26 @@ public class GameManager : MonoBehaviour
             EnemyList.Add(enemy);
         }
 
-        if(TESTING) {
+        // Respawn player, don't worry about "fairness" of the spawn
+        int py = Random.Range(1, CurrentMap.Length - 1);
+        int px = Random.Range(1, CurrentMap[0].Length - 1);
+
+        // Pick a position randomly until it is free
+        while (CurrentMap[py][px] > 0 || (Mathf.Abs(Py - (float)(py)) < 7.0f && Mathf.Abs(Px - (float)(px)) < 7.0f))
+        {
+            py = Random.Range(1, CurrentMap.Length - 1);
+            px = Random.Range(1, CurrentMap[0].Length - 1);
+        }
+
+        // Convert range from [1, n] to [-n/2, n/2]
+        float pey = py - (CurrentMap.Length / 2.0f);
+        float pex = px - (CurrentMap[0].Length / 2.0f);
+
+        // Spawn the player in a new position
+        player.transform.position = new Vector3(pex, pey, 0.0f);
+        player.GetComponent<PlayerScript>().SetHealth(100);
+
+        if (TESTING) {
             GameObject enemy = Instantiate(enemies[GUNNER], new Vector3(1.0f - (CurrentMap.Length / 2.0f), 8.0f - (CurrentMap[0].Length / 2.0f), 0.0f), Quaternion.identity);
             EnemyList.Add(enemy);
         }

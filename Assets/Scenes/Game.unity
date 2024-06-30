@@ -810,7 +810,7 @@ MonoBehaviour:
   - {fileID: 2866692601951738476, guid: 7bc7d063b1c56f148a2c9a4a1b27d6a1, type: 3}
   - {fileID: 8491178705429890444, guid: 7cb85a39e6fc83c4cbf56845977aafb3, type: 3}
   - {fileID: 0}
-  player: {fileID: 0}
+  player: {fileID: 920441894}
   tilemap: {fileID: 1559399588}
   ruleTile: {fileID: 11400000, guid: 9369691228aa0494a8877087b805f0d9, type: 2}
   bgTilemap: {fileID: 1599791113}

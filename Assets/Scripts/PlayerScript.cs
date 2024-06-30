@@ -37,10 +37,14 @@ public class PlayerScript : MonoBehaviour
         var angle = Mathf.Atan2(_direction.y, _direction.x) * Mathf.Rad2Deg;
         transform.rotation = Quaternion.AngleAxis(angle - 90, Vector3.forward);
     }
-    
-    public void TakeDamage(float f) {
-        _health -= f;
+    public void SetHealth(float f)
+    {
+        _health = f;
         healthText.text = "HP " + _health;
+    }
+
+    public void TakeDamage(float f) {
+        SetHealth(_health - f);
         _audioSrc.PlayOneShot(hitSound, 1f);
 
         if (_dmgCoroutine != null) StopCoroutine(_dmgCoroutine);
@@ -119,7 +123,7 @@ public class PlayerScript : MonoBehaviour
         Inventory.AddWeapon(starting.GetComponent<CollectableWeapon>());
 
         _canShoot = true;
-        healthText.text = "HP " + _health;
+        SetHealth(100);
     }
 
     private void Update()
