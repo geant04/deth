@@ -22,7 +22,7 @@ public class Inventory : MonoBehaviour
     private Coroutine _gunCoroutine;
 
     private readonly Color _selected = Color.white;
-    private readonly Color _deselected = new(0f, 0f, 0f, 0.6862745f);
+    private readonly Color _deselected = new(1f, 1f, 1f, 0.4f);
 
     private PlayerScript _player;
     private static readonly int CurrGun = Animator.StringToHash("CurrGun");

@@ -1,6 +1,7 @@
 using System.Collections;
 using UnityEngine;
 using TMPro;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
 using Weapons;
 
@@ -22,7 +23,10 @@ public class PlayerScript : MonoBehaviour
     public GameObject gameOver;
     public Image overlay;
     public AudioClip hitSound;
-    public GameObject startingWeapon;
+    
+    public GameObject pistol;
+    public GameObject rifle;
+    public GameObject shotgun;
     
     private Coroutine _dmgCoroutine;
     
@@ -118,9 +122,14 @@ public class PlayerScript : MonoBehaviour
         _rb = GetComponent<Rigidbody2D>();
         Anim = GetComponent<Animator>();
         _audioSrc = GetComponent<AudioSource>();
-
-        var starting = Instantiate(startingWeapon);
-        Inventory.AddWeapon(starting.GetComponent<CollectableWeapon>());
+        
+        var pistolObj = Instantiate(pistol);
+        var rifleObj = Instantiate(rifle);
+        var shotgunObj = Instantiate(shotgun);
+        
+        Inventory.AddWeapon(pistolObj.GetComponent<CollectableWeapon>());
+        Inventory.AddWeapon(rifleObj.GetComponent<CollectableWeapon>());
+        Inventory.AddWeapon(shotgunObj.GetComponent<CollectableWeapon>());
 
         _canShoot = true;
         SetHealth(100);

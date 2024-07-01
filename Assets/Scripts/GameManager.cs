@@ -378,7 +378,7 @@ public class GameManager : MonoBehaviour
             }
         }
     }
-
+    
     private void GenerateRound()
     {
         roundText.text = "Round " + _roundNum;
@@ -406,11 +406,8 @@ public class GameManager : MonoBehaviour
         tilemap.ClearAllTiles();
         bgTilemap.ClearAllTiles();
         MapToTile();
-        //GenerateTilemapShadowCasters(); too unoptimized
 
-        int minEnemies = 10;
-
-        for (var i = 0; i < Mathf.Min(minEnemies, _roundNum + minEnemies) && !TESTING; i++)
+        for (var i = 0; i < Mathf.Min(20, _roundNum + 2) && !TESTING; i++)
         {
             int y = Random.Range(1, CurrentMap.Length - 1);
             int x = Random.Range(1, CurrentMap[0].Length - 1);
